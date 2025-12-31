@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wordmaster Quiz</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="page">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Science English</p>
+        <h1>Word Quiz</h1>
+        <p class="lede">영영 풀이를 보고 영어 단어를 입력하는 모의 시험</p>
+      </div>
+      <div class="stats" id="summary">
+        <div><span id="score-count">0</span><small>정답</small></div>
+        <div><span id="attempt-count">0</span><small>시도</small></div>
+        <div><span id="pool-count">0</span><small>남은</small></div>
+      </div>
+    </header>
+
+    <section class="card categories">
+      <div class="category-head">
+        <span class="label slim">카테고리</span>
+        <span id="category-summary" class="muted"></span>
+      </div>
+      <div class="chip-row" id="category-bar">카테고리 불러오는 중...</div>
+    </section>
+
+    <section class="card">
+      <div class="prompt">
+        <div id="prompt-label" class="label">Definition</div>
+        <p id="prompt-text">데이터 불러오는 중...</p>
+      </div>
+
+      <div id="image-area" class="image-area hidden">
+        <div class="image-wrapper">
+          <img id="prompt-image" alt="quiz prompt" />
+          <div id="hotspot-layer"></div>
+        </div>
+      </div>
+
+      <div class="input-row" id="input-row">
+        <input type="text" id="answer-input" placeholder="영어 단어 입력 후 Enter 또는 확인" autocomplete="off" />
+        <button id="check-btn">확인</button>
+        <button id="next-btn" class="ghost">다음</button>
+        <button id="reveal-btn" class="ghost">답 보기</button>
+      </div>
+
+      <div id="feedback" class="feedback"></div>
+    </section>
+
+    <section class="help">
+      <p>카테고리를 클릭해 범위를 골라 풀어보세요. 틀리면 한 번 더 입력 기회가 있습니다. 이미지가 있는 문제는 그림 위 빈칸에 입력합니다.</p>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
