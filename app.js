@@ -90,7 +90,8 @@ const renderImageQuestion = (question) => {
     field.dataset.answer = item.answer;
     field.dataset.index = idx + 1;
     if (item.width) {
-      field.style.width = typeof item.width === "number" ? `${item.width}px` : item.width;
+      field.style.width =
+        typeof item.width === "number" ? `${item.width}px` : item.width;
     }
     spot.appendChild(field);
     hotspotLayer.appendChild(spot);
@@ -143,7 +144,7 @@ const checkTextAnswer = () => {
 
   if (!state.current.retryUsed) {
     state.current.retryUsed = true;
-    setFeedback("오답! 한 번 더 입력해보세요.", "error");
+    setFeedback("오답! KLH 바보! 한 번 더 입력해보세요.", "error");
     answerInput.value = "";
     answerInput.focus();
     return;
@@ -178,10 +179,14 @@ const checkImageAnswer = () => {
     setFeedback("정답! 모든 빈칸을 맞췄습니다.", "success");
   } else if (!state.current.retryUsed) {
     state.current.retryUsed = true;
-    const missLabels = misses.map((item) => `#${item.field.dataset.index}`).join(", ");
+    const missLabels = misses
+      .map((item) => `#${item.field.dataset.index}`)
+      .join(", ");
     setFeedback(`오답! 다시 입력하세요. 놓친 번호: ${missLabels}`, "error");
   } else {
-    const missLabels = misses.map((item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`);
+    const missLabels = misses.map(
+      (item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`
+    );
     finishQuestion(false);
     setFeedback(`오답! 정답 확인 → ${missLabels.join(", ")}`, "error");
   }
@@ -199,9 +204,11 @@ const checkAnswer = () => {
 const revealAnswer = () => {
   if (!state.current || state.current.answered) return;
   if (state.current.type === "image") {
-    [...hotspotLayer.querySelectorAll("input[data-answer]")].forEach((field) => {
-      field.value = field.dataset.answer;
-    });
+    [...hotspotLayer.querySelectorAll("input[data-answer]")].forEach(
+      (field) => {
+        field.value = field.dataset.answer;
+      }
+    );
   } else {
     answerInput.value = state.current.answer;
   }
@@ -260,7 +267,9 @@ const buildCategoryBar = (categories) => {
     chip.dataset.key = key;
     if (key === state.category) chip.classList.add("active");
     chip.addEventListener("click", () => {
-      [...categoryBar.querySelectorAll(".chip")].forEach((c) => c.classList.remove("active"));
+      [...categoryBar.querySelectorAll(".chip")].forEach((c) =>
+        c.classList.remove("active")
+      );
       chip.classList.add("active");
       setCategory(key);
     });
@@ -322,7 +331,9 @@ const loadQuestions = async () => {
 };
 
 document.getElementById("check-btn").addEventListener("click", checkAnswer);
-document.getElementById("next-btn").addEventListener("click", () => nextQuestion());
+document
+  .getElementById("next-btn")
+  .addEventListener("click", () => nextQuestion());
 document.getElementById("reveal-btn").addEventListener("click", revealAnswer);
 
 answerInput.addEventListener("keydown", (event) => {
