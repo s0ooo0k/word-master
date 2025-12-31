@@ -11,7 +11,8 @@ const hotspotLayer = document.getElementById("hotspot-layer");
 const categoryBar = document.getElementById("category-bar");
 const categorySummary = document.getElementById("category-summary");
 
-const imageQuestions = []; // 추가 이미지 문제가 있을 때 채워 넣으세요.
+// Add image-based questions here when needed.
+const imageQuestions = [];
 
 const state = {
   allQuestions: [],
@@ -130,6 +131,19 @@ const checkTextAnswer = () => {
     setFeedback("먼저 단어를 입력하세요.", "error");
     return;
   }
+
+  // After answer is revealed, allow practice input without scoring.
+  if (state.current.practiceReady && state.current.answered) {
+    const ok = normalize(guess) === normalize(state.current.answer);
+    setFeedback(
+      ok
+        ? "연습 정답! 다음 문제로 이동하세요."
+        : `연습 오답! 정답: ${state.current.answer}`,
+      ok ? "success" : "error"
+    );
+    return;
+  }
+
   if (state.current.answered) {
     setFeedback("이미 채점된 문제입니다. 다음으로 이동하세요.");
     return;
@@ -139,19 +153,16 @@ const checkTextAnswer = () => {
   if (correct) {
     finishQuestion(true);
     setFeedback("정답!", "success");
-    return;
-  }
-
-  if (!state.current.retryUsed) {
-    state.current.retryUsed = true;
-    setFeedback("오답! KLH 바보! 한 번 더 입력해보세요.", "error");
+  } else {
+    finishQuestion(false);
+    state.current.practiceReady = true;
+    setFeedback(
+      `오답! 정답: ${state.current.answer} · KLH 바보! 다시 한 번 연습해보세용`,
+      "error"
+    );
     answerInput.value = "";
     answerInput.focus();
-    return;
   }
-
-  finishQuestion(false);
-  setFeedback(`오답! 정답: ${state.current.answer}`, "error");
 };
 
 const checkImageAnswer = () => {
@@ -161,6 +172,30 @@ const checkImageAnswer = () => {
     setFeedback("이미지 빈칸 정보가 없습니다.", "error");
     return;
   }
+
+  // Practice mode after answer revealed
+  if (state.current.practiceReady && state.current.answered) {
+    const misses = blanks
+      .map((field) => ({
+        ok: normalize(field.value) === normalize(field.dataset.answer),
+        field,
+      }))
+      .filter((item) => !item.ok);
+    const correct = misses.length === 0;
+    const missLabels = misses
+      .map(
+        (item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`
+      )
+      .join(", ");
+    setFeedback(
+      correct
+        ? "연습 정답! 다음으로 이동하세요."
+        : `연습 오답! 정답 → ${missLabels || "확인됨"}`,
+      correct ? "success" : "error"
+    );
+    return;
+  }
+
   if (state.current.answered) {
     setFeedback("이미 채점된 문제입니다. 다음으로 이동하세요.");
     return;
@@ -177,18 +212,21 @@ const checkImageAnswer = () => {
   if (correct) {
     finishQuestion(true);
     setFeedback("정답! 모든 빈칸을 맞췄습니다.", "success");
-  } else if (!state.current.retryUsed) {
-    state.current.retryUsed = true;
-    const missLabels = misses
-      .map((item) => `#${item.field.dataset.index}`)
-      .join(", ");
-    setFeedback(`오답! 다시 입력하세요. 놓친 번호: ${missLabels}`, "error");
   } else {
-    const missLabels = misses.map(
-      (item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`
-    );
     finishQuestion(false);
-    setFeedback(`오답! 정답 확인 → ${missLabels.join(", ")}`, "error");
+    state.current.practiceReady = true;
+    const missLabels = misses
+      .map(
+        (item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`
+      )
+      .join(", ");
+    blanks.forEach((field) => {
+      field.value = field.dataset.answer;
+    });
+    setFeedback(
+      `오답! 정답을 표시했습니다 → ${missLabels}. 연습용으로 다시 입력해보세요.`,
+      "error"
+    );
   }
 };
 
@@ -213,14 +251,15 @@ const revealAnswer = () => {
     answerInput.value = state.current.answer;
   }
   state.current.answered = true;
-  setFeedback("정답을 표시했습니다. 다음 문제로 이동하세요.");
+  state.current.practiceReady = true;
+  setFeedback("정답을 표시했습니다. 연습용으로 한 번 더 입력해보세요.");
   updateSummary();
 };
 
 const freshQuestion = (q) => ({
   ...q,
   answered: false,
-  retryUsed: false,
+  practiceReady: false,
   wasCorrect: false,
 });
 
