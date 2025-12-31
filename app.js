@@ -132,7 +132,7 @@ const checkTextAnswer = () => {
     return;
   }
 
-  // After answer is revealed, allow practice input without scoring.
+  // Practice attempt after answer was shown
   if (state.current.practiceReady && state.current.answered) {
     const ok = normalize(guess) === normalize(state.current.answer);
     setFeedback(
@@ -141,6 +141,7 @@ const checkTextAnswer = () => {
         : `연습 오답! 정답: ${state.current.answer}`,
       ok ? "success" : "error"
     );
+    if (ok) nextQuestion();
     return;
   }
 
@@ -153,11 +154,12 @@ const checkTextAnswer = () => {
   if (correct) {
     finishQuestion(true);
     setFeedback("정답!", "success");
+    nextQuestion();
   } else {
     finishQuestion(false);
     state.current.practiceReady = true;
     setFeedback(
-      `오답! 정답: ${state.current.answer} · KLH 바보! 다시 한 번 연습해보세용`,
+      `오답! 정답: ${state.current.answer} · 연습용으로 한 번 더 입력해보세요.`,
       "error"
     );
     answerInput.value = "";
@@ -173,7 +175,7 @@ const checkImageAnswer = () => {
     return;
   }
 
-  // Practice mode after answer revealed
+  // Practice after answer was shown
   if (state.current.practiceReady && state.current.answered) {
     const misses = blanks
       .map((field) => ({
@@ -183,9 +185,7 @@ const checkImageAnswer = () => {
       .filter((item) => !item.ok);
     const correct = misses.length === 0;
     const missLabels = misses
-      .map(
-        (item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`
-      )
+      .map((item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`)
       .join(", ");
     setFeedback(
       correct
@@ -193,6 +193,7 @@ const checkImageAnswer = () => {
         : `연습 오답! 정답 → ${missLabels || "확인됨"}`,
       correct ? "success" : "error"
     );
+    if (correct) nextQuestion();
     return;
   }
 
@@ -212,13 +213,12 @@ const checkImageAnswer = () => {
   if (correct) {
     finishQuestion(true);
     setFeedback("정답! 모든 빈칸을 맞췄습니다.", "success");
+    nextQuestion();
   } else {
     finishQuestion(false);
     state.current.practiceReady = true;
     const missLabels = misses
-      .map(
-        (item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`
-      )
+      .map((item) => `#${item.field.dataset.index}: ${item.field.dataset.answer}`)
       .join(", ");
     blanks.forEach((field) => {
       field.value = field.dataset.answer;
